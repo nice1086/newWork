@@ -28,7 +28,7 @@ import com.ruoyi.system.service.ISysMenuService;
  */
 @RestController
 @RequestMapping("/system/menu")
-public class dSysMenuController extends BaseController
+class dSysMenuController extends BaseController
 {
     @Autowired
     private ISysMenuService menuService;

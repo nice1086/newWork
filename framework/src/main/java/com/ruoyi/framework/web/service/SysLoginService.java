@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import cn.hutool.core.util.StrUtil;
 import com.ruoyi.common.exception.user.*;
+import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
