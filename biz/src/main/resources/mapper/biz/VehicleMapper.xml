@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.VehicleMapper">
+    
+    <resultMap type="com.ruoyi.biz.domain.Vehicle" id="VehicleResult">
+        <result property="vehicleId"    column="vehicle_id"    />
+        <result property="carNum"    column="car_num"    />
+        <result property="model"    column="model"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="status"    column="status"    />
+        <result property="vehicleType"    column="vehicle_type"    />
+        <result property="imgUrl"    column="img_url"    />
+        <result property="type"    column="type"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="contacts"    column="contacts"    />
+        <result property="telephone"    column="telephone"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectVehicleVo">
+        select vehicle_id, car_num, model, company_id, status, vehicle_type, img_url, type, start_time, end_time, contacts, telephone, remark, create_by, create_time, update_by, update_time from t_vehicle
+    </sql>
+
+    <select id="selectVehicleList" parameterType="com.ruoyi.biz.domain.Vehicle" resultMap="VehicleResult">
+        select a.* from 
+        (select a.vehicle_id, a.car_num, a.model, a.company_id, a.status, a.vehicle_type, a.img_url, a.type, a.start_time, a.end_time, a.contacts, a.telephone, a.remark,
+        a.create_by, a.create_time, a.update_by, a.update_time, a.user_id, tc.company_name,
+        CASE
+        WHEN tb.blacklist_status IS NULL THEN'1'
+        ELSE tb.blacklist_status
+        END AS blacklist_status
+        from t_vehicle a
+        left join t_company tc on tc.company_id = a.company_id
+        LEFT JOIN t_blacklist tb ON tb.blacklist_name = a.car_num AND tb.blacklist_status = '0')  as a                         
+        <where>  
+            <if test="carNum != null  and carNum != ''"> and a.car_num like concat('%',#{carNum},'%')</if>
+            <if test="model != null  and model != ''"> and a.model = #{model}</if>
+            <if test="companyId != null  and companyId != ''"> and a.company_id = #{companyId}</if>
+            <if test="status != null  and status != ''"> and a.status = #{status}</if>
+            <if test="vehicleType != null  and vehicleType != ''"> and a.vehicle_type = #{vehicleType}</if>
+            <if test="imgUrl != null  and imgUrl != ''"> and a.img_url = #{imgUrl}</if>
+            <if test="type != null  and type != ''"> and a.type = #{type}</if>
+            <if test="startTime != null "> and a.start_time = #{startTime}</if>
+            <if test="endTime != null "> and a.end_time = #{endTime}</if>
+            <if test="contacts != null "> and a.contacts = #{contacts}</if>
+            <if test="telephone != null "> and a.telephone = #{telephone}</if>
+            <if test="userId != null and userId != ''"> and a.user_id = #{userId}</if>
+            and a.blacklist_status = 1
+        </where>
+        order by a.vehicle_id desc
+    </select>
+    
+    <select id="selectVehicleByVehicleId" parameterType="Long" resultMap="VehicleResult">
+        select a.vehicle_id, a.car_num, a.model, a.company_id, a.status, a.vehicle_type, a.img_url, a.type, a.start_time, a.end_time,  a.contacts, a.telephone, a.remark,
+               a.create_by, a.create_time, a.update_by, a.update_time ,tc.company_name 
+        from t_vehicle a
+        left join t_company tc on tc.company_id = a.company_id
+        where a.vehicle_id = #{vehicleId}
+    </select>
+    <select id="selectVehicleOneBycarNum" resultType="com.ruoyi.biz.domain.Vehicle">
+        <include refid="selectVehicleVo"/>
+        where car_num = #{carNum}
+        order By end_time
+        limit 1
+    </select>
+
+    <insert id="insertVehicle" parameterType="com.ruoyi.biz.domain.Vehicle" useGeneratedKeys="true" keyProperty="vehicleId">
+        insert ignore into t_vehicle
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="carNum != null">car_num,</if>
+            <if test="model != null">model,</if>
+            <if test="companyId != null">company_id,</if>
+            <if test="status != null">status,</if>
+            <if test="vehicleType != null">vehicle_type,</if>
+            <if test="imgUrl != null">img_url,</if>
+            <if test="type != null">type,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="contacts != null">contacts,</if>
+            <if test="telephone != null">telephone,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="carNum != null">#{carNum},</if>
+            <if test="model != null">#{model},</if>
+            <if test="companyId != null">#{companyId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="vehicleType != null">#{vehicleType},</if>
+            <if test="imgUrl != null">#{imgUrl},</if>
+            <if test="type != null">#{type},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="contacts != null">#{contacts},</if>
+            <if test="telephone != null">#{telephone},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateVehicle" parameterType="com.ruoyi.biz.domain.Vehicle">
+        update t_vehicle
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="carNum != null">car_num = #{carNum},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="companyId != null">company_id = #{companyId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="vehicleType != null">vehicle_type = #{vehicleType},</if>
+            <if test="imgUrl != null">img_url = #{imgUrl},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="contacts != null">contacts = #{contacts},</if>
+            <if test="telephone != null">telephone = #{telephone},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where vehicle_id = #{vehicleId}
+    </update>
+
+    <delete id="deleteVehicleByVehicleId" parameterType="Long">
+        delete from t_vehicle where vehicle_id = #{vehicleId}
+    </delete>
+
+    <delete id="deleteVehicleByVehicleIds" parameterType="String">
+        delete from t_vehicle where vehicle_id in 
+        <foreach item="vehicleId" collection="array" open="(" separator="," close=")">
+            #{vehicleId}
+        </foreach>
+    </delete>
+
+
+    <select id="queryVehicleByCompanyId" resultType="com.ruoyi.biz.domain.Vehicle">
+        <include refid="selectVehicleVo" />
+        where company_id = #{companyId}
+    </select>
+</mapper>

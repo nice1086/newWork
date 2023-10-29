@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.ResidentCompanyMapper">
+
+    <resultMap type="com.ruoyi.biz.domain.VO.ResidentCompanyVO" id="ResidentCompanyResult">
+        <result property="companyId"    column="company_id"    />
+        <result property="companyCode"    column="company_code"    />
+        <result property="orgCode"    column="org_code"    />
+        <result property="companyName"    column="company_name"    />
+        <result property="companyAbbreviation"    column="company_abbreviation"    />
+        <result property="registPlace"    column="regist_place"    />
+        <result property="companySize"    column="company_size"    />
+        <result property="companyType"    column="company_type"    />
+        <result property="leadingCadre"    column="leading_cadre"    />
+        <result property="telephone"    column="telephone"    />
+        <result property="contacts"    column="contacts"    />
+        <result property="mobile"    column="mobile"    />
+        <result property="email"    column="email"    />
+        <result property="businessScope"    column="business_scope"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectResidentCompanyVo">
+        select company_id, company_code, org_code,
+               company_name, company_abbreviation, regist_place,
+               company_size, company_type,
+               leading_cadre, telephone, contacts,
+               mobile, email, business_scope, 
+               status, remark, create_by, create_time, update_by, update_time 
+        from t_company
+    </sql>
+
+    <select id="selectCompanyList" parameterType="com.ruoyi.biz.domain.PO.Company" resultMap="ResidentCompanyResult">
+        <include refid="selectResidentCompanyVo"/>
+        <where>
+            <if test="companyName != null  and companyName != ''"> and company_name like concat('%', #{companyName}, '%')</if>
+            <if test="companySize != null "> and company_size = #{companySize}</if>
+            <if test="companyType != null "> and company_type = #{companyType}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            and registe_type = 1
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectCompanyByCompanyId" parameterType="Long" resultMap="ResidentCompanyResult">
+        <include refid="selectResidentCompanyVo"/>
+        where company_id = #{companyId}
+    </select>
+
+    <insert id="insertCompany" parameterType="com.ruoyi.biz.domain.PO.Company" useGeneratedKeys="true" keyProperty="companyId">
+        insert into t_company
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="companyCode != null">company_code,</if>
+            <if test="orgCode != null">org_code,</if>
+            <if test="companyName != null">company_name,</if>
+            <if test="companyAbbreviation != null">company_abbreviation,</if>
+            <if test="registPlace != null">regist_place,</if>
+            <if test="registeType != null">registe_type,</if>
+            <if test="companySize != null">company_size,</if>
+            <if test="companyType != null">company_type,</if>
+            <if test="leadingCadre != null">leading_cadre,</if>
+            <if test="telephone != null">telephone,</if>
+            <if test="contacts != null">contacts,</if>
+            <if test="mobile != null">mobile,</if>
+            <if test="email != null">email,</if>
+            <if test="businessScope != null">business_scope,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="companyCode != null">#{companyCode},</if>
+            <if test="orgCode != null">#{orgCode},</if>
+            <if test="companyName != null">#{companyName},</if>
+            <if test="companyAbbreviation != null">#{companyAbbreviation},</if>
+            <if test="registPlace != null">#{registPlace},</if>
+            <if test="registeType != null">#{registeType},</if>
+            <if test="companySize != null">#{companySize},</if>
+            <if test="companyType != null">#{companyType},</if>
+            <if test="leadingCadre != null">#{leadingCadre},</if>
+            <if test="telephone != null">#{telephone},</if>
+            <if test="contacts != null">#{contacts},</if>
+            <if test="mobile != null">#{mobile},</if>
+            <if test="email != null">#{email},</if>
+            <if test="businessScope != null">#{businessScope},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCompany" parameterType="com.ruoyi.biz.domain.PO.Company">
+        update t_company
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyCode != null">company_code = #{companyCode},</if>
+            <if test="orgCode != null">org_code = #{orgCode},</if>
+            <if test="companyName != null">company_name = #{companyName},</if>
+            <if test="companyAbbreviation != null">company_abbreviation = #{companyAbbreviation},</if>
+            <if test="registPlace != null">regist_place = #{registPlace},</if>
+            <if test="registeType != null">registe_type = #{registeType},</if>
+            <if test="companySize != null">company_size = #{companySize},</if>
+            <if test="companyType != null">company_type = #{companyType},</if>
+            <if test="leadingCadre != null">leading_cadre = #{leadingCadre},</if>
+            <if test="telephone != null">telephone = #{telephone},</if>
+            <if test="contacts != null">contacts = #{contacts},</if>
+            <if test="mobile != null">mobile = #{mobile},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="businessScope != null">business_scope = #{businessScope},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where company_id = #{companyId}
+    </update>
+
+    <delete id="deleteCompanyByCompanyId" parameterType="Long">
+        delete from t_company where company_id = #{companyId}
+    </delete>
+
+    <delete id="deleteCompanyByCompanyIds" parameterType="String">
+        delete from t_company where company_id in
+        <foreach item="companyId" collection="array" open="(" separator="," close=")">
+            #{companyId}
+        </foreach>
+    </delete>
+
+    <select id="selectTransport" parameterType="long" resultType="long">
+        SELECT company_id FROM t_company WHERE create_company_id = #{companyId}
+    </select>
+
+    <select id="selectVehicleCount" parameterType="list" resultType="int">
+        SELECT COUNT(1) FROM t_vehicle WHERE company_id IN
+        <foreach collection="companyIds" item="companyId" separator="," open="(" close=")">
+            #{companyId}
+        </foreach>
+    </select>
+
+    <select id="selectCarNo" parameterType="list" resultType="string">
+        SELECT car_num FROM t_vehicle WHERE company_id IN
+        <foreach collection="companyIds" item="companyId" separator="," open="(" close=")">
+            #{companyId}
+        </foreach>
+    </select>
+
+    <select id="checkUnique" parameterType="com.ruoyi.biz.domain.PO.Company" resultType="int">
+        SELECT COUNT(1) FROM t_company WHERE (company_name=#{companyName} OR mobile=#{mobile}
+                                          OR org_code=#{orgCode} OR company_code=#{companyCode})
+        <if test="companyId != null">
+            AND company_id!=#{companyId}
+        </if>
+    </select>
+
+    <select id="countSubAccount" parameterType="long" resultType="int">
+        SELECT COUNT(*) FROM sys_user WHERE company_id = #{companyId} AND user_type='02'
+    </select>
+
+</mapper>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.BlacklistMapper">
+
+    <resultMap type="Blacklist" id="BlacklistResult">
+        <result property="blacklistId"    column="blacklist_id"    />
+        <result property="blacklistType"    column="blacklist_type"    />
+        <result property="blacklistName"    column="blacklist_name"    />
+        <result property="blacklistStatus"    column="blacklist_status"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="reason"    column="reason"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="companyId" column="company_id"/>
+        <result property="alarmSyscode" column="alarm_syscode"/>
+        <result property="blacklistScoop" column="blacklist_scoop"/>
+    </resultMap>
+
+    <sql id="selectBlacklistVo">
+        select blacklist_id, blacklist_type, blacklist_name, blacklist_status, start_time,
+        end_time, reason, remark, create_by, create_time, update_by, update_time, company_id,
+        alarm_syscode, blacklist_scoop from t_blacklist
+    </sql>
+
+    <select id="selectBlacklistList" parameterType="Blacklist" resultMap="BlacklistResult">
+        <include refid="selectBlacklistVo"/>
+        <where>
+            <if test="blacklistType != null  and blacklistType != ''"> and blacklist_type = #{blacklistType}</if>
+            <if test="blacklistName != null  and blacklistName != ''"> and blacklist_name like concat('%', #{blacklistName}, '%')</if>
+            <if test="blacklistStatus != null "> and blacklist_status = #{blacklistStatus}</if>
+            <if test="startTime != null "> and start_time = #{startTime}</if>
+            <if test="endTime != null "> and end_time = #{endTime}</if>
+            <if test="reason != null  and reason != ''"> and reason = #{reason}</if>
+        </where>
+        order by blacklist_id desc
+    </select>
+
+    <select id="selectBlacklistByBlacklistId" parameterType="Long" resultMap="BlacklistResult">
+        <include refid="selectBlacklistVo"/>
+        where blacklist_id = #{blacklistId}
+    </select>
+    <select id="queryBlackCarsByCompanyId" resultType="com.ruoyi.biz.domain.PO.Blacklist"
+            parameterType="java.lang.Long">
+        <include refid="selectBlacklistVo"/>
+        where company_id = #{companyId} and blacklist_scoop = 1 and blacklist_type = '车辆'
+    </select>
+    <select id="queryBlackListByAlarmSyscode" resultType="com.ruoyi.biz.domain.PO.Blacklist"
+            parameterType="java.lang.String">
+        <include refid="selectBlacklistVo"/>
+        where alarm_syscode = #{alarmSyscode}
+    </select>
+    <select id="queryByCompanyId" resultType="com.ruoyi.biz.domain.PO.Blacklist"
+            parameterType="java.lang.Long">
+        <include refid="selectBlacklistVo"/>
+        where company_id = #{companyId} and blacklist_status = 0
+    </select>
+    <select id="queryByCarNum" resultType="com.ruoyi.biz.domain.PO.Blacklist" parameterType="java.lang.String">
+        <include refid="selectBlacklistVo"/>
+        where blacklist_name = #{carNum}
+    </select>
+    <select id="queryEffectiveBlacklistCar" resultType="com.ruoyi.biz.domain.PO.Blacklist" parameterType="java.lang.String">
+        <include refid="selectBlacklistVo"/>
+        where blacklist_name = #{carNum} and blacklist_status = 0
+    </select>
+
+    <insert id="insertBlacklist" parameterType="com.ruoyi.biz.domain.PO.Blacklist" useGeneratedKeys="true" keyProperty="blacklistId">
+        insert into t_blacklist
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="blacklistType != null">blacklist_type,</if>
+            <if test="blacklistName != null">blacklist_name,</if>
+            <if test="blacklistStatus != null">blacklist_status,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="reason != null">reason,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="companyId != null">company_id,</if>
+            <if test="alarmSyscode != null">alarm_syscode,</if>
+            <if test="blacklistScoop != null">blacklist_scoop,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="blacklistType != null">#{blacklistType},</if>
+            <if test="blacklistName != null">#{blacklistName},</if>
+            <if test="blacklistStatus != null">#{blacklistStatus},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="reason != null">#{reason},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="companyId != null">#{companyId},</if>
+            <if test="alarmSyscode != null">#{alarmSyscode},</if>
+            <if test="blacklistScoop != null">#{blacklistScoop},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBlacklist" parameterType="Blacklist">
+        update t_blacklist
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="blacklistType != null">blacklist_type = #{blacklistType},</if>
+            <if test="blacklistName != null">blacklist_name = #{blacklistName},</if>
+            <if test="blacklistStatus != null">blacklist_status = #{blacklistStatus},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="reason != null">reason = #{reason},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="companyId != null">company_id = #{companyId},</if>
+            <if test="alarmSyscode != null">alarm_syscode = #{alarmSyscode},</if>
+            <if test="blacklistScoop != null">blacklist_scoop = #{blacklistScoop},</if>
+        </trim>
+        where blacklist_id = #{blacklistId}
+    </update>
+    <update id="logicDeleteBlackList" parameterType="java.lang.Long">
+        update t_blacklist
+        set blacklist_status = 1
+        where blacklist_id = #{blacklistId}
+    </update>
+    <update id="resetAll">
+        update t_blacklist
+        set blacklist_status = 2
+        where blacklist_status = 0
+    </update>
+    <update id="releaseAll">
+        update t_blacklist
+        set blacklist_status = 1
+        where blacklist_status = 2
+    </update>
+    <update id="confirmBlackList" parameterType="String">
+        update t_blacklist
+        set blacklist_status = 0
+        where blacklist_status = 2 and alarm_syscode = #{alarmSyscode}
+    </update>
+
+    <delete id="deleteBlacklistByBlacklistId" parameterType="Long">
+        delete from t_blacklist where blacklist_id = #{blacklistId}
+    </delete>
+
+    <delete id="deleteBlacklistByBlacklistIds" parameterType="String">
+        delete from t_blacklist where blacklist_id in
+        <foreach item="blacklistId" collection="array" open="(" separator="," close=")">
+            #{blacklistId}
+        </foreach>
+    </delete>
+</mapper>

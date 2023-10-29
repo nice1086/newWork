@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.TransportCompanyMapper">
+
+    <resultMap type="com.ruoyi.biz.domain.VO.TransportCompanyVO" id="TransportCompanyResult">
+        <result property="companyId"    column="company_id"    />
+        <result property="companyCode"    column="company_code"    />
+        <result property="orgCode"    column="org_code"    />
+        <result property="companyName"    column="company_name"    />
+        <result property="companyAbbreviation"    column="company_abbreviation"    />
+        <result property="telephone"    column="telephone"    />
+        <result property="contacts"    column="contacts"    />
+        <result property="mobile"    column="mobile"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+        <result property="createCompanyId"    column="create_company_id"    />
+        <result property="createCompany"    column="create_company"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectTransportCompanyVo">
+        select a.company_id, a.company_code, a.org_code,
+               a.company_name, a.company_abbreviation,
+               a.telephone, a.contacts, a.mobile,
+               a.status, a.remark, a.create_company_id,b.company_name as create_company,
+               a.create_by, a.create_time, a.update_by, a.update_time
+        from t_company as a
+        left join t_company as b on b.company_id = a.create_company_id
+    </sql>
+
+    <select id="selectCompanyList" parameterType="com.ruoyi.biz.domain.PO.Company" resultMap="TransportCompanyResult">
+        <include refid="selectTransportCompanyVo"/>
+        <where>
+            <if test="companyName != null  and companyName != ''"> and a.company_name like concat('%', #{companyName}, '%')</if>
+            <if test="status != null  and status != ''"> and a.status = #{status}</if>
+            <if test="createCompanyId != null"> and a.create_company_id = #{createCompanyId}</if>
+            and a.registe_type = 2
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectCompanyByCompanyId" parameterType="Long" resultMap="TransportCompanyResult">
+        <include refid="selectTransportCompanyVo"/>
+        where a.company_id = #{companyId}
+    </select>
+
+    <insert id="insertCompany" parameterType="com.ruoyi.biz.domain.PO.Company" useGeneratedKeys="true" keyProperty="companyId">
+        insert into t_company
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="companyCode != null">company_code,</if>
+            <if test="orgCode != null">org_code,</if>
+            <if test="companyName != null">company_name,</if>
+            <if test="companyAbbreviation != null">company_abbreviation,</if>
+            <if test="registeType != null">registe_type,</if>
+            <if test="telephone != null">telephone,</if>
+            <if test="contacts != null">contacts,</if>
+            <if test="mobile != null">mobile,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createCompanyId != null">create_company_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="companyCode != null">#{companyCode},</if>
+            <if test="orgCode != null">#{orgCode},</if>
+            <if test="companyName != null">#{companyName},</if>
+            <if test="companyAbbreviation != null">#{companyAbbreviation},</if>
+            <if test="registeType != null">#{registeType},</if>
+            <if test="telephone != null">#{telephone},</if>
+            <if test="contacts != null">#{contacts},</if>
+            <if test="mobile != null">#{mobile},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createCompanyId != null">#{createCompanyId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCompany" parameterType="com.ruoyi.biz.domain.PO.Company">
+        update t_company
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyCode != null">company_code = #{companyCode},</if>
+            <if test="orgCode != null">org_code = #{orgCode},</if>
+            <if test="companyName != null">company_name = #{companyName},</if>
+            <if test="companyAbbreviation != null">company_abbreviation = #{companyAbbreviation},</if>
+            <if test="registeType != null">registe_type = #{registeType},</if>
+            <if test="telephone != null">telephone = #{telephone},</if>
+            <if test="contacts != null">contacts = #{contacts},</if>
+            <if test="mobile != null">mobile = #{mobile},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createCompanyId != null">create_company_id = #{createCompanyId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where company_id = #{companyId}
+    </update>
+
+    <delete id="deleteCompanyByCompanyId" parameterType="Long">
+        delete from t_company where company_id = #{companyId}
+    </delete>
+
+    <delete id="deleteCompanyByCompanyIds" parameterType="String">
+        delete from t_company where company_id in
+        <foreach item="companyId" collection="array" open="(" separator="," close=")">
+            #{companyId}
+        </foreach>
+    </delete>
+
+    <select id="selectVehicleCount" parameterType="long" resultType="int">
+        SELECT COUNT(1) FROM t_vehicle WHERE company_id = #{companyId}
+    </select>
+
+    <select id="checkUnique" parameterType="com.ruoyi.biz.domain.PO.Company" resultType="int">
+        SELECT COUNT(1) FROM t_company WHERE (company_name=#{companyName} OR mobile=#{mobile}
+                                          OR org_code=#{orgCode}
+        OR company_code=#{companyCode}
+        OR create_company_id =#{createCompanyId})
+        <if test="companyId != null">
+            AND company_id!=#{companyId}
+        </if>
+    </select>
+    <select id="queryCompanyIdByCompanyName" resultType="java.lang.Long" parameterType="java.lang.String">
+        select company_id
+        from t_company
+        where company_name = #{companyName}
+    </select>
+    <select id="queryCompanyByOrgCode" resultType="com.ruoyi.biz.domain.PO.Company">
+        <include refid="selectTransportCompanyVo"/>
+        where a.org_code = #{orgCode} and a.create_company_id is null
+    </select>
+
+</mapper>

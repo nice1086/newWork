@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.DataAnalysisMapper">
+
+    <select id="selectEntranceName" resultType="string">
+        SELECT
+            DISTINCT entrance_name
+        FROM
+            t_vehicle_record
+        ORDER BY entrance_name
+    </select>
+
+    <select id="selectEntranceCountName" parameterType="com.ruoyi.biz.domain.BO.EntranceCountSearchBO" resultType="map">
+        SELECT
+            entrance_name AS name,
+            COUNT(vehicle_out = 1 OR NULL) AS out_count,
+            COUNT(vehicle_out = 0 OR NULL) AS in_count,
+            count(*) AS sum_count
+        FROM
+            t_vehicle_record
+        WHERE
+            cross_time >= #{startTime} AND cross_time &lt;= #{endTime}
+        GROUP BY
+            entrance_name
+    </select>
+
+    <select id="selectEntranceCountDay" parameterType="com.ruoyi.biz.domain.BO.EntranceCountSearchBO" resultType="map">
+        SELECT
+            DATE_FORMAT(cross_time, '%Y-%m-%d') AS name,
+            COUNT(vehicle_out = 1 OR NULL) AS out_count,
+            COUNT(vehicle_out = 0 OR NULL) AS in_count,
+            COUNT(*) AS sum_count
+        FROM
+            t_vehicle_record
+        WHERE
+            cross_time >= #{startTime} AND cross_time &lt;= #{endTime} AND entrance_name=#{entrance}
+        GROUP BY
+            DATE_FORMAT(cross_time, '%Y-%m-%d')
+    </select>
+
+    <select id="selectEntranceCountHour" parameterType="com.ruoyi.biz.domain.BO.EntranceCountSearchBO" resultType="map">
+        SELECT
+            DATE_FORMAT(cross_time, '%H') AS name,
+            COUNT(vehicle_out = 1 OR NULL) AS out_count,
+            COUNT(vehicle_out = 0 OR NULL) AS in_count,
+            COUNT(*) AS sum_count
+        FROM
+            t_vehicle_record
+        WHERE
+            cross_time >= #{startTime} AND cross_time &lt;= #{endTime} AND entrance_name=#{entrance}
+        GROUP BY
+            DATE_FORMAT(cross_time, '%H')
+    </select>
+
+    <select id="selectCompanyCount" resultType="map">
+        SELECT
+            COUNT(vehicle_out = 1 OR NULL) AS out_count,
+            COUNT(vehicle_out = 0 OR NULL) AS in_count,
+            COUNT(*) AS sum_count
+        FROM
+            t_vehicle_record
+        WHERE plate_no in
+        <foreach collection="plateNos" open="(" close=")" item="plateNo" separator=",">
+            #{plateNo}
+        </foreach>
+    </select>
+
+    <select id="getVehicleCount" resultType="long">
+        SELECT COUNT(*) FROM t_vehicle_record
+        <if test="!#{all}">
+            <where>
+                cross_time >= #{search.startTime} AND cross_time &lt;= #{search.endTime}
+            </where>
+        </if>
+    </select>
+
+</mapper>

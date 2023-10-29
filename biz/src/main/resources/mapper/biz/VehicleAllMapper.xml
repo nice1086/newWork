@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.VehicleAllMapper">
+
+
+    <select id="selectAll" resultType="map">
+        <bind name="duration" value="day_type" />
+SELECT
+        CAST(SUM(IF(vehicle_out=1, 1, 0)) AS SIGNED) AS isout,
+        CAST(SUM(IF(vehicle_out=0, 1, 0)) AS SIGNED) AS isin,
+    CASE
+        WHEN #{duration} = 'day' THEN DATE_FORMAT(cross_time, '%Y-%m-%d')
+        WHEN #{duration} = 'month' THEN DATE_FORMAT(cross_time, '%Y-%m')
+        WHEN #{duration} = 'year' THEN DATE_FORMAT(cross_time, '%Y')
+    END AS cross_time
+FROM
+    t_vehicle_record
+WHERE
+        cross_time &lt;= CURDATE()+INTERVAL 1 DAY
+GROUP BY
+    CASE
+        WHEN #{duration} = 'day' THEN DATE_FORMAT(cross_time,'%Y-%m-%d')
+        WHEN #{duration} = 'month' THEN DATE_FORMAT(cross_time,'%Y-%m')
+        WHEN #{duration} = 'year' THEN DATE_FORMAT(cross_time,'%Y')
+    END;
+
+    </select>
+</mapper>

@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.biz.mapper.SysNoticeAddMapper">
+
+    <resultMap type="com.ruoyi.biz.domain.SysNoticeVO" id="SysNoticeAddResult">
+        <result property="noticeId"       column="notice_id"       />
+        <result property="noticeTitle"    column="notice_title"    />
+        <result property="noticeType"     column="notice_type"     />
+        <result property="noticeContent"  column="notice_content"  />
+        <result property="status"         column="status"          />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="remark"         column="remark"          />
+        <result property="isRead"         column="is_read"          />
+    </resultMap>
+
+    <sql id="selectNoticeVo">
+        select notice_id, notice_title, notice_type,
+        cast(notice_content as char) as notice_content,
+        status, create_by,create_time,remark
+		from sys_notice
+    </sql>
+
+    <sql id="selectNoticeExceptContent">
+        select notice_id, notice_title, notice_type,
+        status, create_by,create_time,remark
+        from sys_notice
+    </sql>
+
+    <sql id="selectNoticeDTO">
+        SELECT
+	a.notice_id,
+	a.notice_title,
+	a.notice_type,
+	a.notice_content,
+	a.`status`,
+	a.create_by,
+	a.create_time,
+	a.remark,
+	a.to_user_id,
+	a.is_read
+FROM
+	(
+		SELECT
+			sys_notice.notice_id,
+			sys_notice.notice_title,
+			sys_notice.notice_type,
+			sys_notice.notice_content,
+			sys_notice.`status`,
+			sys_notice.create_by,
+			sys_notice.create_time,
+			sys_notice.remark,
+			sys_notice_user.to_user_id,
+			sys_notice_user.is_read
+		FROM
+			sys_notice_user
+			INNER JOIN
+			sys_notice
+			ON
+				sys_notice_user.create_by = sys_notice.create_by AND
+				sys_notice_user.create_time = sys_notice.create_time
+	) AS a
+    </sql>
+
+    <insert id="noticeAdd" useGeneratedKeys="true" keyProperty="noticeId">
+        insert into sys_notice (
+        <if test="noticeTitle != null and noticeTitle != '' ">notice_title,</if>
+        <if test="noticeType != null and noticeType != '' ">notice_type,</if>
+        <if test="noticeContent != null and noticeContent != '' ">notice_content,</if>
+        <if test="status != null and status != '' ">status,</if>
+        <if test="remark != null and remark != ''">remark,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        )values(
+        <if test="noticeTitle != null and noticeTitle != ''">#{noticeTitle},</if>
+        <if test="noticeType != null and noticeType != ''">#{noticeType},</if>
+        <if test="noticeContent != null and noticeContent != ''">#{noticeContent},</if>
+        <if test="status != null and status != ''">#{status},</if>
+        <if test="remark != null and remark != ''">#{remark},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+    <insert id="noticeUserAdd">
+        insert into sys_notice_user (
+        create_by,
+        create_time,
+        to_user_id,
+        notice_id
+        )values(
+        #{sysNoticeDTO.sysNoticeAdd.createBy},
+        sysdate(),
+        #{sysNoticeDTO.to_user_id},
+        #{sysNoticeDTO.noticeId}
+        )
+    </insert>
+
+    <update id="updateStatus">
+   update sys_notice_user INNER JOIN sys_notice
+			ON
+				sys_notice_user.create_by = sys_notice.create_by AND
+				sys_notice_user.create_time = sys_notice.create_time
+        set is_read = 1
+				where
+				sys_notice.notice_id =
+            (
+				SELECT
+                a.notice_id
+              FROM
+	        (
+		SELECT
+			sys_notice.notice_id,
+			sys_notice.`status`,
+			sys_notice.create_by,
+			sys_notice.create_time,
+			sys_notice_user.to_user_id
+		FROM
+			sys_notice_user
+			INNER JOIN
+			sys_notice
+			ON
+				sys_notice_user.create_by = sys_notice.create_by AND
+				sys_notice_user.create_time = sys_notice.create_time
+		WHERE
+			to_user_id = #{user_id}
+			AND
+			sys_notice.`status` = 1
+	) AS a
+	WHERE
+	 a.notice_id = #{notice_id}
+	 )
+
+    </update>
+    <update id="readNotice" parameterType="java.lang.Long">
+        update sys_notice_user set is_read = 1 where notice_user_id = #{id}
+    </update>
+    <delete id="deleteDraft" parameterType="java.lang.String">
+        delete from sys_notice where remark = 'draft' and create_by = #{createBy}
+    </delete>
+
+
+    <select id="selectNoticeDetails">
+        SELECT
+          count(is_read)
+        FROM
+        sys_notice_user AS snu
+        Right JOIN
+        sys_notice AS sn
+        ON
+        snu.create_by = sn.create_by AND
+        snu.create_time = sn.create_time
+        where
+          snu.to_user_id = #{user_id}
+          and
+          is_read = 0
+          and
+          sn.status = 1
+        order by
+        sn.create_time
+    </select>
+
+    <select id="selectNoticeMore">
+        <include refid="selectNoticeDTO"/>
+        where
+        status = 0
+        and
+        to_user_id = #{user_id}
+    </select>
+
+    <select id="selectNoticeMoreAll">
+        <include refid="selectNoticeDTO"/>
+        where
+        to_user_id = #{user_id}
+        and
+        status = 0
+        UNION
+        <include refid="selectNoticeDTO"/>
+        where
+        create_by = #{create_by}
+    </select>
+    <select id="selectAdminNotice" resultType="com.ruoyi.biz.domain.SysNoticeVO">
+        <include refid="selectNoticeExceptContent"/>
+        where remark is null
+    </select>
+    <select id="selectUserNotice" resultType="com.ruoyi.biz.domain.SysNoticeVO">
+        SELECT
+        b.notice_user_id,
+        a.notice_id,
+        a.notice_title,
+        a.notice_type,
+        a.STATUS,
+        a.create_by,
+        a.create_time,
+        a.remark,
+        b.is_read
+        FROM
+        sys_notice_user AS b
+        LEFT JOIN sys_notice a ON a.notice_id = b.notice_id
+        WHERE
+        a.STATUS = 0
+        and b.to_user_id = #{userId}
+        order by notice_user_id desc
+    </select>
+
+    <select id="noticeDetail" parameterType="java.lang.Long" resultType="com.ruoyi.biz.domain.SysNoticeVO">
+        SELECT
+        a.notice_id,
+        a.notice_title,
+        a.notice_type,
+        a.STATUS,
+        cast(notice_content as char) as notice_content,
+        a.create_by,
+        a.create_time,
+        a.remark,
+        b.is_read
+        FROM
+        sys_notice_user AS b
+        LEFT JOIN sys_notice a ON a.notice_id = b.notice_id
+        WHERE
+        a.STATUS = 0
+        and b.notice_user_id = #{id}
+    </select>
+    <select id="countUnread" resultType="java.lang.Long" parameterType="java.lang.Long">
+        SELECT
+        COUNT( 1 )
+        FROM
+        sys_notice_user
+        WHERE
+        is_read = 0
+        and to_user_id = #{userId}
+    </select>
+    <select id="draftDatail" resultType="com.ruoyi.biz.domain.SysNoticeVO" parameterType="java.lang.String">
+        <include refid="selectNoticeVo" />
+        WHERE
+        remark = 'draft'
+        and create_by = #{createBy}
+    </select>
+    <select id="adminNoticeDetail" resultType="com.ruoyi.biz.domain.SysNoticeVO"
+            parameterType="java.lang.Long">
+        SELECT
+        a.notice_id,
+        a.notice_title,
+        a.notice_type,
+        a.STATUS,
+        cast(notice_content as char) as notice_content,
+        a.create_by,
+        a.create_time,
+        a.remark
+        FROM
+        sys_notice AS a
+        WHERE
+        a.notice_id = #{noticeId}
+    </select>
+</mapper>
