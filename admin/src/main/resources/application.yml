@@ -1,7 +1,7 @@
 # 项目相关配置
 ruoyi:
   # 名称
-  name: vehicleSys
+  name: vedioSys
   # 版本
   version: 3.8.6
   # 版权年份

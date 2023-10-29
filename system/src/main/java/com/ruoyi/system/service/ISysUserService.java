@@ -1,10 +1,8 @@
 package com.ruoyi.system.service;
 
-import java.util.List;
-import java.util.Map;
-
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.system.domain.vo.CompanyUserVO;
+
+import java.util.List;
 
 /**
  * 用户 业务层
@@ -61,13 +59,6 @@ public interface ISysUserService
      */
     public String selectUserRoleGroup(String userName);
 
-    /**
-     * 根据用户ID查询用户所属岗位组
-     * 
-     * @param userName 用户名
-     * @return 结果
-     */
-    public String selectUserPostGroup(String userName);
 
     /**
      * 校验用户名称是否唯一
@@ -207,21 +198,6 @@ public interface ISysUserService
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
 
-    /**
-     * 根据企业新增驻区企业和承运企业的用户信息
-     *
-     * @param companyUserVO 用户信息
-     * @return 结果
-     */
-    public Map<String, Object> insertCompanyUser(CompanyUserVO companyUserVO);
-
-    /**
-     * 根据企业修改驻区企业和承运企业的用户信息
-     *
-     * @param companyUserVO 用户信息
-     * @return 结果
-     */
-    public int updateCompanyUser(CompanyUserVO companyUserVO);
 
     List<SysUser> selectUserSonList(SysUser user);
 

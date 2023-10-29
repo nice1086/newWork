@@ -3,11 +3,6 @@ package com.ruoyi.web.controller.system;
 import java.util.List;
 import java.util.Set;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ObjectUtil;
-import com.ruoyi.biz.domain.PO.Company;
-import com.ruoyi.biz.domain.VO.ResidentCompanyVO;
-import com.ruoyi.biz.service.IResidentCompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,8 +39,6 @@ public class SysLoginController
     @Autowired
     private SysPermissionService permissionService;
 
-    @Autowired
-    private IResidentCompanyService residentCompanyService;
 
     /**
      * 登录方法
@@ -79,19 +72,7 @@ public class SysLoginController
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合
         Set<String> permissions = permissionService.getMenuPermission(user);
-        //当前用户所属企业信息
-        if(user.getCompanyId()!=null){
-            ResidentCompanyVO residentCompanyVO = residentCompanyService.selectCompanyByCompanyId(user.getCompanyId());
-            if(ObjectUtil.isNotEmpty(residentCompanyVO)){
-                Company company = new Company();
-                BeanUtil.copyProperties(residentCompanyVO, company);
-                user.setCompanyCode(company.getCompanyCode());
-                user.setCompanyName(company.getCompanyName());
-                user.setCompanySize(company.getCompanySize());
-                user.setCompanyType(company.getCompanyType());
-                user.setCreateCompanyId(company.getCreateCompanyId());
-            }
-        }
+
         AjaxResult ajax = AjaxResult.success();
         ajax.put("user", user);
         ajax.put("roles", roles);

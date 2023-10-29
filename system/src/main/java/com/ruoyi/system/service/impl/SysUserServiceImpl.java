@@ -1,30 +1,16 @@
 package com.ruoyi.system.service.impl;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.validation.Validator;
-import javax.xml.crypto.Data;
-
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.utils.DateUtils;
-import com.ruoyi.common.utils.PageUtils;
-import com.ruoyi.system.domain.vo.CompanyUserVO;
-import com.ruoyi.system.service.ISysRoleService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.PageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanValidators;
@@ -32,13 +18,24 @@ import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.domain.SysUserRole;
-import com.ruoyi.system.mapper.SysPostMapper;
+import com.ruoyi.system.domain.vo.CompanyUserVO;
 import com.ruoyi.system.mapper.SysRoleMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
-import com.ruoyi.system.mapper.SysUserPostMapper;
 import com.ruoyi.system.mapper.SysUserRoleMapper;
 import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import javax.validation.Validator;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户 业务层处理
@@ -57,13 +54,7 @@ public class SysUserServiceImpl implements ISysUserService
     private SysRoleMapper roleMapper;
 
     @Autowired
-    private SysPostMapper postMapper;
-
-    @Autowired
     private SysUserRoleMapper userRoleMapper;
-
-    @Autowired
-    private SysUserPostMapper userPostMapper;
 
     @Autowired
     private ISysConfigService configService;
@@ -81,7 +72,7 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
+    @DataScope(userAlias = "u")
     public List<SysUser> selectUserList(SysUser user)
     {
 
@@ -108,7 +99,7 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
+    @DataScope(userAlias = "u")
     public List<SysUser> selectAllocatedList(SysUser user)
     {
         return userMapper.selectAllocatedList(user);
@@ -121,7 +112,7 @@ public class SysUserServiceImpl implements ISysUserService
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
+    @DataScope(userAlias = "u")
     public List<SysUser> selectUnallocatedList(SysUser user)
     {
         return userMapper.selectUnallocatedList(user);
@@ -166,23 +157,6 @@ public class SysUserServiceImpl implements ISysUserService
             return StringUtils.EMPTY;
         }
         return list.stream().map(SysRole::getRoleName).collect(Collectors.joining(","));
-    }
-
-    /**
-     * 查询用户所属岗位组
-     * 
-     * @param userName 用户名
-     * @return 结果
-     */
-    @Override
-    public String selectUserPostGroup(String userName)
-    {
-        List<SysPost> list = postMapper.selectPostsByUserName(userName);
-        if (CollectionUtils.isEmpty(list))
-        {
-            return StringUtils.EMPTY;
-        }
-        return list.stream().map(SysPost::getPostName).collect(Collectors.joining(","));
     }
 
     /**
@@ -295,8 +269,7 @@ public class SysUserServiceImpl implements ISysUserService
         // 新增用户信息
         user.setCreateBy(sysUser.getUserId()+"");
         int rows = userMapper.insertUser(user);
-        // 新增用户岗位关联
-        insertUserPost(user);
+
         // 新增用户与角色管理
         insertUserRole(user);
         return rows;
@@ -329,10 +302,6 @@ public class SysUserServiceImpl implements ISysUserService
         userRoleMapper.deleteUserRoleByUserId(userId);
         // 新增用户与角色管理
         insertUserRole(user);
-        // 删除用户与岗位关联
-        userPostMapper.deleteUserPostByUserId(userId);
-        // 新增用户与岗位管理
-        insertUserPost(user);
         return userMapper.updateUser(user);
     }
 
@@ -422,28 +391,6 @@ public class SysUserServiceImpl implements ISysUserService
         this.insertUserRole(user.getUserId(), user.getRoleIds());
     }
 
-    /**
-     * 新增用户岗位信息
-     * 
-     * @param user 用户对象
-     */
-    public void insertUserPost(SysUser user)
-    {
-        Long[] posts = user.getPostIds();
-        if (StringUtils.isNotEmpty(posts))
-        {
-            // 新增用户与岗位管理
-            List<SysUserPost> list = new ArrayList<SysUserPost>(posts.length);
-            for (Long postId : posts)
-            {
-                SysUserPost up = new SysUserPost();
-                up.setUserId(user.getUserId());
-                up.setPostId(postId);
-                list.add(up);
-            }
-            userPostMapper.batchUserPost(list);
-        }
-    }
 
     /**
      * 新增用户角色信息
@@ -482,8 +429,7 @@ public class SysUserServiceImpl implements ISysUserService
     {
         // 删除用户与角色关联
         userRoleMapper.deleteUserRoleByUserId(userId);
-        // 删除用户与岗位表
-        userPostMapper.deleteUserPostByUserId(userId);
+
         return userMapper.deleteUserById(userId);
     }
 
@@ -504,8 +450,7 @@ public class SysUserServiceImpl implements ISysUserService
         }
         // 删除用户与角色关联
         userRoleMapper.deleteUserRole(userIds);
-        // 删除用户与岗位关联
-        userPostMapper.deleteUserPost(userIds);
+
         return userMapper.deleteUserByIds(userIds);
     }
 
@@ -581,131 +526,7 @@ public class SysUserServiceImpl implements ISysUserService
         return successMsg.toString();
     }
 
-    @Override
-    public Map<String, Object> insertCompanyUser(CompanyUserVO companyUserVO) {
-        Date date = new Date();
-        if(ObjectUtil.isNotEmpty(companyUserVO)){
-            LoginUser loginUser = SecurityUtils.getLoginUser();
-            SysUser sysUser = new SysUser();
-            if(ObjectUtil.isNotEmpty(companyUserVO.getUserId())){
-                QueryWrapper<SysUser> queryWrapper = new QueryWrapper();
-                queryWrapper.eq("user_id",companyUserVO.getUserId());
-                SysUser sysUser1 = userMapper.selectOne(queryWrapper);
-                if(ObjectUtil.isNotEmpty(sysUser1)){
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("error","该用户已存在");
-                    return map;
-                }
-            }
-            BeanUtils.copyProperties(companyUserVO, sysUser);
-            sysUser.setCreateTime(date);
-            sysUser.setCreateBy(loginUser.getUsername());
-            //默认用户所属主企业
-            sysUser.setUserType("01");
-            //用户昵称==联系人
-            sysUser.setNickName(companyUserVO.getContacts());
-            //用户账号==联系人手机号
-            sysUser.setUserName(companyUserVO.getMobile());
-            sysUser.setPhonenumber(companyUserVO.getMobile());
-            sysUser.setStatus("0");
-            sysUser.setPassword(SecurityUtils.encryptPassword(sysUser.getPassword()));
-            //添加用户
-            userMapper.insert(sysUser);
-            Long userId = sysUser.getUserId();
-            System.out.println("用户id为"+userId);
-            List<SysRole> sysRoles = roleService.selectRoleAll();
-            Map<String, Long> collect = sysRoles.stream().collect(Collectors.toMap(SysRole::getRoleKey, SysRole::getRoleId));
-            //存储用户与角色关联表数据
-            List<SysUserRole> roleList = new ArrayList<>();
-            //承运企业
-            if (companyUserVO.getRegisteType()!= null && companyUserVO.getRegisteType()==2){
-                SysUserRole sysUserRole = new SysUserRole();
-                sysUserRole.setUserId(userId);
-                sysUserRole.setRoleId(collect.get("chengyun"));
-                roleList.add(sysUserRole);
-            }
-            //驻区企业
-            if (companyUserVO.getRegisteType()!= null && companyUserVO.getRegisteType()==1){
-                //大型企业
-                if (companyUserVO.getCompanySize()!= null && companyUserVO.getCompanySize()==2){
-                    SysUserRole sysUserRole = new SysUserRole();
-                    sysUserRole.setUserId(userId);
-                    sysUserRole.setRoleId(collect.get("large_company"));
-//                    sysUserRole.setRoleId(collect.get("subaccount"));
-                    roleList.add(sysUserRole);
-                }
-                //无装卸作业
-                if (companyUserVO.getCompanyType()!= null && companyUserVO.getCompanyType()==1){
-                    SysUserRole sysUserRole = new SysUserRole();
-                    sysUserRole.setUserId(userId);
-                    sysUserRole.setRoleId(collect.get("wuzhuangxie"));
-                    roleList.add(sysUserRole);
-                }
-                //有装卸作业
-                if (companyUserVO.getCompanyType()!= null && companyUserVO.getCompanyType()==2){
-                    SysUserRole sysUserRole = new SysUserRole();
-                    sysUserRole.setUserId(userId);
-                    sysUserRole.setRoleId(collect.get("zhuangxie"));
-                    roleList.add(sysUserRole);
-                }
-            }
-            userRoleMapper.batchUserRole(roleList);
-            Map<String, Object> map = new HashMap<>();
-            map.put("userId", userId);
-            return map;
-        }
-        return null;
-    }
-    @Override
-    @Transactional
-    public int updateCompanyUser(CompanyUserVO companyUserVO) {
-        if(ObjectUtil.isNotEmpty(companyUserVO.getCompanyId())){
-            QueryWrapper<SysUser> queryWrapper = new QueryWrapper();
-            queryWrapper.eq("company_id",companyUserVO.getCompanyId());
-            SysUser sysUser1 = userMapper.selectOne(queryWrapper);
-            if(ObjectUtil.isNotEmpty(sysUser1)){
-                List<SysUserRole> userRoleList= new ArrayList<>();
-                //企业规模（1小型 2大型)
-                if(companyUserVO.getCompanySize()!=null){
-                    SysUserRole sysUserRole = new SysUserRole();
-                    sysUserRole.setUserId(sysUser1.getUserId());
-                    if(companyUserVO.getCompanySize() == 2){
-                        sysUserRole.setRoleId(102L);
-                        userRoleList.add(sysUserRole);
-                    }
-                    if(companyUserVO.getCompanySize() == 1){
-                        sysUserRole.setRoleId(102L);
-                        userRoleMapper.deleteUserRoleInfo(sysUserRole);
-                    }
-                }
-                //入驻企业类型：1无装卸作业企业 2有装卸作业企业
-                if(companyUserVO.getCompanyType()!=null){
-                    SysUserRole updateSysUserRole = new SysUserRole();
-                    SysUserRole delUpdateSysUserRole = new SysUserRole();
-                    updateSysUserRole.setUserId(sysUser1.getUserId());
-                    delUpdateSysUserRole.setUserId(sysUser1.getUserId());
-                    if(companyUserVO.getCompanyType() == 1){
-                        updateSysUserRole.setRoleId(104L);
-                        userRoleList.add(updateSysUserRole);
-                        delUpdateSysUserRole.setRoleId(103L);
-                        userRoleMapper.deleteUserRoleInfo(delUpdateSysUserRole);
-                    }
-                    if(companyUserVO.getCompanyType() == 2){
-                        updateSysUserRole.setRoleId(103L);
-                        userRoleList.add(updateSysUserRole);
-                        delUpdateSysUserRole.setRoleId(104L);
-                        userRoleMapper.deleteUserRoleInfo(delUpdateSysUserRole);
-                    }
-                    if(userRoleList.size()>0){
-                        userRoleMapper.batchUserRole(userRoleList);
-                    }
-                    
-                }
-                return 1;
-            }
-        }
-        return 0;
-    }
+
 
     /**
      * 根据条件分页查询子用户列表
@@ -713,7 +534,7 @@ public class SysUserServiceImpl implements ISysUserService
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    @DataScope(deptAlias = "d", userAlias = "u")
+    @DataScope(userAlias = "u")
     @Override
     public List<SysUser> selectUserSonList(SysUser user) {
             //用户验证
@@ -872,8 +693,7 @@ public class SysUserServiceImpl implements ISysUserService
                 roleList.add(sysUserRole);
                 userRoleMapper.batchUserRole(roleList);
             }
-            // 新增用户岗位关联
-            insertUserPost(user);
+
 //            // 新增用户与角色管理
 //            insertUserRole(user);
             return rows;

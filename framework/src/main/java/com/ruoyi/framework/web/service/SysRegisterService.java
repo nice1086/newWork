@@ -16,7 +16,6 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
 import com.ruoyi.system.service.ISysConfigService;
-import com.ruoyi.system.service.ISysUserService;
 
 /**
  * 注册校验方法
