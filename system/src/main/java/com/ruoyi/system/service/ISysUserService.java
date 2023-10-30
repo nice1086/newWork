@@ -205,10 +205,5 @@ public interface ISysUserService
 
     int insertSonUser(SysUser user);
 
-    /**
-     * 根据用户ID查询其关联企业状态
-     * @param userName 用户名
-     * @return 企业状态
-     */
-    String selectCompanyStatus(String userName);
+
 }

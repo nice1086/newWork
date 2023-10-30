@@ -695,14 +695,5 @@ public class SysUserServiceImpl implements ISysUserService
     }
 
 
-    /**
-     * 根据用户ID查询其关联企业状态
-     *
-     * @param userName 用户名
-     * @return 企业状态
-     */
-    @Override
-    public String selectCompanyStatus(String userName) {
-        return userMapper.selectCompanyStatus(userName);
-    }
+
 }
