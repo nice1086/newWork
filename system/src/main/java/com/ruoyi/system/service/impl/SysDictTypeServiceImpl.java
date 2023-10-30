@@ -81,51 +81,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     @Override
     public List<SysDictData> selectDictDataByType(String dictType)
     {
-        SysUser user = SecurityUtils.getLoginUser().getUser();
-        List<SysDictData> dictDatas = DictUtils.getDictCache(dictType.trim());
-        if (StringUtils.isNotEmpty(dictDatas))
-        {
-//            return dictDatas;
-        }
-        dictDatas = dictDataMapper.selectDictDataByType(dictType);
-        if (StringUtils.isNotEmpty(dictDatas))
-        {
-            if("vehicle_type".equals(dictType.trim())){
-                List<SysRole> sysRoles = roleService.selectAllAuthUserList(user.getUserId());
-                if(ObjectUtil.isNotEmpty(sysRoles)){
-                    for (SysRole sysRole : sysRoles) {
-                        if("admin".equals(sysRole.getRoleKey()) && "manage".equals(sysRole.getRoleKey()) ) break;
-                        //驻区企业（无装卸）
-                        if("wuzhuangxie".equals(sysRole.getRoleKey())){
-                            dictDatas=dictDatas.stream().filter(x -> "1".equals(x.getDictValue()) || "2".equals(x.getDictValue()) || "3".equals(x.getDictValue())).collect(Collectors.toList());
-                            break;
-                        }
-                        //驻区企业（有装卸）
-                        if("zhuangxie".equals(sysRole.getRoleKey())){
-                            dictDatas=
-                                    dictDatas.stream().filter(x ->
-                                            "1".equals(x.getDictValue())
-                                                    || "2".equals(x.getDictValue())
-                                                    || "3".equals(x.getDictValue())
-                                                    || "4".equals(x.getDictValue())
-                                                    || "5".equals(x.getDictValue())
-                                                    || "7".equals(x.getDictValue())
-                                            )
-                                            .collect(Collectors.toList());
-                            break;
-                        }
-                        //危化品
-                        if("chengyun".equals(sysRole.getRoleKey())){
-                            dictDatas=dictDatas.stream().filter(x ->  "4".equals(x.getDictValue())).collect(Collectors.toList());
-                            break;
-                        }
-                        
-                    }
-                }
-            }
-            DictUtils.setDictCache(dictType, dictDatas);
-            return dictDatas;
-        }
         return null;
     }
 
