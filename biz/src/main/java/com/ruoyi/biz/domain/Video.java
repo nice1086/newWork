@@ -9,7 +9,7 @@ import nonapi.io.github.classgraph.json.Id;
 import java.util.Date;
 
 @Data
-public class Vedio {
+public class Video {
     @Id
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -75,7 +75,7 @@ public class Vedio {
 
     @Override
     public String toString() {
-        return "Vedio{" +
+        return "Video{" +
                 "id=" + id +
                 ", titile='" + titile + '\'' +
                 ", videoUrl='" + videoUrl + '\'' +
