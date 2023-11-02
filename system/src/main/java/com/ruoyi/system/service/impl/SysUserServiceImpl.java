@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
@@ -77,9 +76,6 @@ public class SysUserServiceImpl implements ISysUserService
         if(ObjectUtil.isNotEmpty(sysUser)){
             if(sysUser.getUserType()!=null){
                 user.setUserTypeParent(sysUser.getUserType().trim());
-            }
-            if(sysUser.getCompanyId()!=null){
-                user.setCompanyId(sysUser.getCompanyId());
             }
             
         }
@@ -256,11 +252,6 @@ public class SysUserServiceImpl implements ISysUserService
         //用户验证
         SysUser user1 = SecurityUtils.getLoginUser().getUser();
         SysUser sysUser = userMapper.selectUserById(user1.getUserId());
-        if(ObjectUtil.isNotEmpty(sysUser)&& sysUser.getCompanyId()!=null){
-            if(user.getCompanyId()==null){
-                user.setCompanyId(sysUser.getCompanyId());
-            }
-        }
         // 新增用户信息
         user.setCreateBy(sysUser.getUserId()+"");
         int rows = userMapper.insertUser(user);
@@ -535,11 +526,6 @@ public class SysUserServiceImpl implements ISysUserService
             //用户验证
             SysUser user1 = SecurityUtils.getLoginUser().getUser();
             SysUser sysUser = userMapper.selectUserById(user1.getUserId());
-            if(ObjectUtil.isNotEmpty(sysUser)){
-                if(sysUser.getCompanyId()!=null){
-                    user.setCompanyId(sysUser.getCompanyId());
-                }
-            }
         // 角色集合
         List<SysRole> sysRoles = roleService.selectAllAuthUserList(user1.getUserId());
         if(sysRoles.size()>0){
@@ -551,11 +537,7 @@ public class SysUserServiceImpl implements ISysUserService
             }
 
         }
-        sysRoles.forEach(item->{
-            if(CharSequenceUtil.equals(item.getRoleKey().trim(), "manage")){
-                user.setCompanyId(null);
-            }
-        });
+
             PageUtils.startPage();
 
             return userMapper.selectUserSonList(user);
@@ -659,12 +641,11 @@ public class SysUserServiceImpl implements ISysUserService
             //用户验证
             SysUser user1 = SecurityUtils.getLoginUser().getUser();
 //            SysUser sysUser = userMapper.selectUserById(user1.getUserId());
-            user.setCompanyId(user1.getCompanyId());
+
             user.setCreateTime(DateUtils.getNowDate());
             user.setCreateBy(user1.getUserId()+"");
             user.setUpdateBy(user1.getUserName());
             user.setUpdateTime(DateUtils.getNowDate());
-            user.setDeptId(101L);
             user.setUserType("02");
             // 新增用户信息
             int rows = userMapper.insertUser(user);

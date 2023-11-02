@@ -60,6 +60,6 @@ public class UserOpenIdDetailServiceImpl implements UserOpenIdDetailsService {
     
     public UserDetails createLoginUser(SysUser user)
     {
-        return new LoginUser(user.getUserId(), user.getDeptId(), user, permissionService.getMenuPermission(user));
+        return new LoginUser(user.getUserId(), user, permissionService.getMenuPermission(user));
     }
 }

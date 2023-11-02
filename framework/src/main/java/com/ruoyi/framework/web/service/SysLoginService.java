@@ -32,7 +32,7 @@ import com.ruoyi.system.service.ISysConfigService;
 /**
  * 登录校验方法
  * 
- * @author ruoyi
+ *
  */
 @Component
 public class SysLoginService
@@ -163,11 +163,7 @@ public class SysLoginService
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("login.blocked")));
             throw new BlackListException();
         }
-        // 用户企业是否可用
-        String companyStatus = userService.selectCompanyStatus(username);
-        if (StrUtil.isNotBlank(companyStatus) && "-1".equals(companyStatus)) {
-            throw new CompanyStatusException();
-        }
+
     }
 
     /**

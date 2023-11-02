@@ -36,9 +36,6 @@ public class SysUser extends BaseEntity
     @TableId(type = IdType.AUTO)
     private Long userId;
 
-    /** 部门ID */
-    @Excel(name = "部门编号", type = Type.IMPORT)
-    private Long deptId;
 
     /** 用户账号 */
     @Excel(name = "登录名称")
@@ -81,20 +78,12 @@ public class SysUser extends BaseEntity
     @Excel(name = "最后登录时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Type.EXPORT)
     private Date loginDate;
 
-    /** 用户类型（00系统用户 01企业用户 02企业子用户） */
+    /** 用户类型*/
     private String userType;
 
-    /** 当前登录用户类型（00系统用户 01企业用户 02企业子用户） */
+    /** 当前登录用户类型*/
     @TableField(exist = false)
     private String userTypeParent;
-
-    /** 部门对象 */
-    @Excels({
-        @Excel(name = "部门名称", targetAttr = "deptName", type = Type.EXPORT),
-        @Excel(name = "部门负责人", targetAttr = "leader", type = Type.EXPORT)
-    })
-    @TableField(exist = false)
-    private SysDept dept;
 
     /** 角色对象 */
     @TableField(exist = false)
@@ -103,10 +92,6 @@ public class SysUser extends BaseEntity
     /** 角色组 */
     @TableField(exist = false)
     private Long[] roleIds;
-
-    /** 岗位组 */
-    @TableField(exist = false)
-    private Long[] postIds;
 
     /** 角色ID */
     @TableField(exist = false)
@@ -117,46 +102,6 @@ public class SysUser extends BaseEntity
     private String openid;
 
     private String openId;
-
-    /** 企业ID */
-    @ApiModelProperty(value="企业ID,所属企业")
-    private Long companyId;
-
-//    /** 企业用户对象 */
-//    @TableField(exist = false)
-//    private Company company;
-
-    /** 企业编码（如入驻企业B001 承运D001） */
-    @TableField(exist = false)
-    @ApiModelProperty(value = "企业编码")
-    private String companyCode;
-
-    /** 企业名称 */
-    @TableField(exist = false)
-    @ApiModelProperty(value = "企业名称")
-    private String companyName;
-
-    /** 注册类型 1驻区企业 2承运企业 */
-    @TableField(exist = false)
-    @ApiModelProperty(value = "注册类型 1驻区企业 2承运企业")
-    private Integer registeType;
-
-    /** 企业规模（1小型 2大型 见数据字典） */
-    @TableField(exist = false)
-    @ApiModelProperty(value = "企业规模(数据字典)")
-    private Integer companySize;
-
-    /** 入驻企业类型：1无装卸作业企业 2有装卸作业企业 见数据字典 */
-    @TableField(exist = false)
-    @ApiModelProperty(value = "入驻企业类型（数据字典）")
-    private Integer companyType;
-
-    /** 创建所属企业 */
-    @TableField(exist = false)
-    @ApiModelProperty(value = "责任企业id")
-    private Long createCompanyId;
-    
-
 
     public SysUser()
     {
@@ -188,15 +133,6 @@ public class SysUser extends BaseEntity
         return userId != null && 1L == userId;
     }
 
-    public Long getDeptId()
-    {
-        return deptId;
-    }
-
-    public void setDeptId(Long deptId)
-    {
-        this.deptId = deptId;
-    }
 
     @Xss(message = "用户昵称不能包含脚本字符")
     @Size(min = 0, max = 30, message = "用户昵称长度不能超过30个字符")
@@ -316,16 +252,6 @@ public class SysUser extends BaseEntity
         this.loginDate = loginDate;
     }
 
-    public SysDept getDept()
-    {
-        return dept;
-    }
-
-    public void setDept(SysDept dept)
-    {
-        this.dept = dept;
-    }
-
     public List<SysRole> getRoles()
     {
         return roles;
@@ -344,16 +270,6 @@ public class SysUser extends BaseEntity
     public void setRoleIds(Long[] roleIds)
     {
         this.roleIds = roleIds;
-    }
-
-    public Long[] getPostIds()
-    {
-        return postIds;
-    }
-
-    public void setPostIds(Long[] postIds)
-    {
-        this.postIds = postIds;
     }
 
     public Long getRoleId()
@@ -390,19 +306,10 @@ public class SysUser extends BaseEntity
         this.openId = openId;
     }
 
-    public Long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
-    }
-
 	@Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("userId", getUserId())
-            .append("deptId", getDeptId())
             .append("userName", getUserName())
             .append("nickName", getNickName())
             .append("email", getEmail())
@@ -419,7 +326,6 @@ public class SysUser extends BaseEntity
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
             .append("remark", getRemark())
-            .append("dept", getDept())
             .toString();
     }
 
@@ -431,11 +337,4 @@ public class SysUser extends BaseEntity
         this.userTypeParent = userTypeParent;
     }
 
-//    public Company getCompany() {
-//        return company;
-//    }
-//
-//    public void setCompany(Company company) {
-//        this.company = company;
-//    }
 }

@@ -36,9 +36,9 @@ public class VedioController {
         return new ResponseEntity<>(videoFiles, HttpStatus.OK);
     }
 
-    @GetMapping("/videos/{id}")
-    public ResponseEntity<String> getVideoUrl(@PathVariable("id") String fileId) throws ExecutionException, InterruptedException {
-        String videoUrl = IVideoService.getVideoUrl(fileId).get();
+    @GetMapping("/videos/{category}")
+    public ResponseEntity<String> getVideoUrl(@PathVariable("category") String category) throws ExecutionException, InterruptedException {
+        String videoUrl = IVideoService.getVideoUrl(category).get();
         return new ResponseEntity<>(videoUrl, HttpStatus.OK);
     }
 
