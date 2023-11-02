@@ -109,6 +109,10 @@ methods: {
  selectVideo(index) {
    this.currentVideoIndex = index;
  },
+ selectVideoCollection(index) {
+this.currentVideoCollectionIndex = index;
+this.currentVideoIndex = 0; // 切换视频集合时，将当前视频索引重置为0
+},
  toggleLike() {
    if (this.currentVideo.liked) {
      if (this.currentVideo.likes > 0) {
