@@ -40,9 +40,9 @@
               <el-input style="height: 30px; width: 100%; border: 1px solid rgba(0, 0, 0, 0.4);border-radius: 5px;" v-model="user.captchaImage"></el-input>
             </el-col>
             <el-col :span="12">
-              <div class="login-code" @click="refreshCode" style="cursor: pointer;">
+              <div class="login-code" style="cursor: pointer;">
                 <captcha-component>
-                  <img v-if="captcha" :src="captcha.img" alt="验证码">
+                 
                 </captcha-component>
               </div>
             </el-col>
@@ -71,13 +71,12 @@ import CaptchaComponent from './CaptchaComponent.vue'
 import { ref, reactive} from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-
 export default {
   components:{
     CaptchaComponent
   },
   setup() {
-    
+
     const router = useRouter()
 
     const labelPosition = ref('login')
@@ -99,6 +98,7 @@ export default {
         ElMessage.success("注册成功！")
         router.push("/login")
         labelPosition.value = 'login'
+    
       }
     }
 

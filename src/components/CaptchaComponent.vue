@@ -79,9 +79,9 @@ import { useStore } from "vuex";
     methods: {   
       refreshCaptcha() {
 
-        const store = useStore();
+      const store = useStore();
       // 调用 mutations 更新数据
-      store.commit('setUuid', '101');
+      store.commit('setUuid', '1011');
       store.commit('setCaptchaImage', 'asdf');
 
     // axios.get(`/captchaImage?t=${Date.now()}`)
