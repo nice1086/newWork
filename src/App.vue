@@ -1,16 +1,25 @@
 <template>
-  <VedioComponent msg="hello"/>
+    <!-- <home-component/> -->
+    <router-view/>
 </template>
 
 <script>
-import VedioComponent from './components/VedioComponent.vue';
+// import HomeComponent from './components/HomeComponent.vue';
 
-export default {
-  name: 'App',
-  components: {
-    VedioComponent
-}
-}
+window.addEventListener('error', function onError(e) {
+    // Ignore ResizeObserver error
+    if (e.message === 'ResizeObserver loop limit exceeded') {
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
+  });
+
+// export default {
+//   name: 'App',
+//   components: {
+//     HomeComponent
+// }
+// }
 </script>
 
 <style>

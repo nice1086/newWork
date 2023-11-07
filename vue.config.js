@@ -1,8 +1,14 @@
 const { defineConfig } = require('@vue/cli-service')
+const path = require('path')
+const resolve = (dir) => {
+  return path.join(__dirname,dir)
+}
+
 module.exports = defineConfig({
   transpileDependencies: true
 }
 )
+
 module.exports = {
   devServer: {
     host:'localhost',
@@ -14,6 +20,16 @@ module.exports = {
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
+        }
+      }
+    }
+  },
+  publicPath:"/",
+  configureWebpack(){
+    return {
+      resolve:{
+        alias:{
+          '@':resolve('src')
         }
       }
     }

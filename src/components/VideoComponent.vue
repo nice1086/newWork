@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import axios from 'axios';  
+// import axios from 'axios';  
 const currentVideoCollectionIndex = 0;
 
 export default {
@@ -48,8 +48,8 @@ data() {
        videos: [
          {
            id: 1,
-           src: 'video1.mp4',
-           title: '热门视频1',
+           src: '',
+           title: '',
            likes: 11000,
            liked: false
          }
@@ -57,31 +57,73 @@ data() {
      },
      {
        title: '体育频道',
-       videos: []
+       videos: [{
+          id:'',
+          src:'',
+          title:'',
+          likes:'',
+          liked:''
+       }]
      },
      {
        title: '音乐频道',
-       videos: []
+       videos: [{
+          id:'',
+          src:'',
+          title:'',
+          likes:'',
+          liked:''
+       }]
      },
       {
        title: '美妆频道',
-       videos: []
+       videos: [{
+          id:'',
+          src:'',
+          title:'',
+          likes:'',
+          liked:''
+       }]
      },
        {
        title: '时尚频道',
-       videos: []
+       videos: [{
+          id:'',
+          src:'',
+          title:'',
+          likes:'',
+          liked:''
+       }]
      },
       {
        title: '二次元频道',
-       videos: []
+       videos: [{
+          id:'',
+          src:'',
+          title:'',
+          likes:'',
+          liked:''
+       }]
      },
        {
        title: '娱乐频道',
-       videos: []
+       videos: [{
+          id:'',
+          src:'',
+          title:'',
+          likes:'',
+          liked:''
+       }]
      },
       {
        title: '知识频道',
-       videos: []
+       videos: [{
+          id:'',
+          src:'',
+          title:'',
+          likes:'',
+          liked:''
+       }]
      }
    ],
    currentVideoCollectionIndex,
@@ -126,33 +168,32 @@ this.currentVideoIndex = 0; // 切换视频集合时，将当前视频索引重�
    this.currentVideo.liked = !this.currentVideo.liked;
  },
  fetchVideoList() {
-      // 使用API从后端获取视频数据
-      // 可以使用axios或其他库发送异步请求，获取视频数据，并更新videoList
-      axios
-        .get('/api/videos')
-        .then(response => {
-          const data = response.data;
+//       // 使用API从后端获取视频数据
+//       // 可以使用axios或其他库发送异步请求，获取视频数据，并更新videoList
+//       axios
+//         .get('/biz/videos/videos')
+//         .then(response => {
+//           const data = response.data;
 
-          this.videoList = data.map(collection => {
-            return {
-              title: collection.title ? collection.title : '',
-              videos: collection.videos
-                ? collection.videos.map(video => {
-                    return {
-                      id: video.id ? video.id : '',
-                      src: video.src ? video.src : '',
-                      title: video.title ? video.title : '',
-                      likes: video.likes ? video.likes : 0,
-                      liked: false
-                    };
-                  })
-                : []
-            };
-          });
-        })
-        .catch(error => {
-          console.log(error);
-        });
+//           this.videoList = data.map(collection => {
+//             return {
+//               videos: collection.videos
+//                 ? collection.videos.map(video => {
+//                     return {
+//                       id: video.id ? video.id : '',
+//                       src: video.src ? video.src : '',
+//                       title: video.title ? video.title : '',
+//                       likes: video.likes ? video.likes : 0,
+//                       liked: false
+//                     };
+//                   })
+//                 : []
+//             };
+//           });
+//         })
+//         .catch(error => {
+//           console.log(error);
+//         });
     },
 },
 mounted() {
@@ -168,7 +209,7 @@ this.fetchVideoList(); // 在组件挂载后调用fetchVideoList方法，获取�
 };
 </script>
 
-<style>
+<style scoped>
 #app{
    background-color: black;
 }
